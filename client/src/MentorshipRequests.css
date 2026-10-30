@@ -1,0 +1,179 @@
+
+.mentorship-requests {
+  margin-top: 24px;
+}
+
+.mentorship-form {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  margin: 18px 0 24px;
+  border: 1px solid #e8e8f0;
+  border-radius: 12px;
+}
+
+.mentorship-form h4 {
+  margin: 0 0 4px;
+}
+
+.mentorship-form label,
+.request-response-form label {
+  color: #55536b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mentorship-form select,
+.mentorship-form textarea,
+.request-response-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #dedee8;
+  border-radius: 9px;
+  background: #fff;
+  color: #24243a;
+  font: inherit;
+}
+
+.mentorship-form select:focus,
+.mentorship-form textarea:focus,
+.request-response-form textarea:focus {
+  outline: 2px solid rgba(118, 97, 232, 0.25);
+  border-color: #7661e8;
+}
+
+.mentorship-form button {
+  justify-self: start;
+  margin-top: 5px;
+}
+
+.mentorship-request-list {
+  display: grid;
+  gap: 14px;
+}
+
+.mentorship-request-item {
+  padding: 18px;
+  border: 1px solid #e8e8f0;
+  border-radius: 12px;
+  min-width: 0;
+}
+
+.mentorship-request-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.mentorship-request-top h4 {
+  margin: 0 0 5px;
+  overflow-wrap: anywhere;
+}
+
+.mentorship-request-date {
+  margin: 0;
+  color: #858398;
+  font-size: 12px;
+}
+
+.request-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pending {
+  color: #8a6100;
+  background: #fff2cc;
+}
+
+.status-accepted {
+  color: #18794e;
+  background: #e6f7ee;
+}
+
+.status-rejected {
+  color: #b42318;
+  background: #feeceb;
+}
+
+.request-message {
+  margin: 16px 0;
+  color: #5f5d73;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.mentor-response {
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 8px;
+  background: #f5f3ff;
+  color: #55536b;
+}
+
+.mentor-response p {
+  margin: 6px 0 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.request-response-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.request-action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.accept-request-button,
+.reject-request-button {
+  padding: 9px 15px;
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.accept-request-button {
+  color: #fff;
+  background: #21845a;
+}
+
+.reject-request-button {
+  color: #a52222;
+  background: #feeceb;
+}
+
+.accept-request-button:disabled,
+.reject-request-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mentorship-error,
+.mentorship-success {
+  padding: 10px 12px;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.mentorship-error {
+  color: #a52222;
+  background: #feeceb;
+}
+
+.mentorship-success {
+  color: #18794e;
+  background: #e6f7ee;
+}

@@ -1,122 +1,271 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+
+import { useState } from "react";
+import "./App.css";
+import Dashboard from "./Dashboard";
+import MentorDashboard from "./MentorDashboard";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("student");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("capstonehub_user");
+      const savedToken = localStorage.getItem("capstonehub_token");
+
+      return savedUser && savedToken ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setMessage("");
+    setLoading(true);
+
+    try {
+      const endpoint = isLogin ? "login" : "register";
+
+      const body = isLogin
+        ? { email, password }
+        : { name, email, password, role };
+
+      const response = await fetch(
+        `http://localhost:5000/api/auth/${endpoint}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Something went wrong.");
+      }
+
+      if (isLogin) {
+        localStorage.setItem("capstonehub_token", data.token);
+        localStorage.setItem("capstonehub_user", JSON.stringify(data.user));
+        setUser(data.user);
+      } else {
+        setMessage("Account created successfully! You can now log in.");
+        setIsLogin(true);
+        setPassword("");
+      }
+    } catch (error) {
+      setMessage(
+        error.message === "Failed to fetch"
+          ? "Cannot connect to the server. Make sure the backend is running."
+          : error.message
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("capstonehub_token");
+    localStorage.removeItem("capstonehub_user");
+
+    setUser(null);
+    setIsLogin(true);
+    setName("");
+    setEmail("");
+    setPassword("");
+    setRole("student");
+    setMessage("");
+  }
+
+  if (user) {
+    if (user.role === "mentor") {
+      return <MentorDashboard user={user} onLogout={handleLogout} />;
+    }
+
+    return <Dashboard user={user} onLogout={handleLogout} />;
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <main className="auth-page">
+      <section className="brand-panel">
+        <div className="brand">
+          <div className="brand-icon">C</div>
+          <span>CapstoneHub</span>
         </div>
-        <div>
-          <h1>Get started</h1>
+
+        <div className="brand-content">
+          <span className="eyebrow">YOUR IDEAS. YOUR FUTURE.</span>
+          <h1>Build something<br />that matters.</h1>
           <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+            A smarter space to manage projects, collaborate with your team,
+            and learn from mentors.
+          </p>
+
+          <div className="feature">
+            <span className="feature-icon">✦</span>
+            <div>
+              <strong>Manage projects</strong>
+              <p>Turn your ideas into real outcomes.</p>
+            </div>
+          </div>
+
+          <div className="feature">
+            <span className="feature-icon">↗</span>
+            <div>
+              <strong>Learn together</strong>
+              <p>Collaborate and grow with mentors.</p>
+            </div>
+          </div>
+        </div>
+
+        <p className="brand-footer">A better way to build, together.</p>
+      </section>
+
+      <section className="form-panel">
+        <div className="auth-card">
+          <div className="mobile-brand">
+            <div className="brand-icon">C</div>
+            <span>CapstoneHub</span>
+          </div>
+
+          <div className="form-heading">
+            <span className="eyebrow">
+              {isLogin ? "WELCOME BACK" : "GET STARTED"}
+            </span>
+            <h2>{isLogin ? "Sign in to your account" : "Create your account"}</h2>
+            <p>
+              {isLogin
+                ? "Enter your details to continue your journey."
+                : "Join CapstoneHub and bring your ideas to life."}
+            </p>
+          </div>
+
+          <div className="auth-tabs">
+            <button
+              type="button"
+              className={isLogin ? "active" : ""}
+              onClick={() => {
+                setIsLogin(true);
+                setMessage("");
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={!isLogin ? "active" : ""}
+              onClick={() => {
+                setIsLogin(false);
+                setMessage("");
+              }}
+            >
+              Create Account
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            {!isLogin && (
+              <>
+                <label htmlFor="name">Full name</label>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  minLength={2}
+                  maxLength={80}
+                  required
+                />
+              </>
+            )}
+
+            <label htmlFor="email">Email address</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder={isLogin ? "Enter your password" : "At least 8 characters"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              minLength={8}
+              required
+            />
+
+            {!isLogin && (
+              <>
+                <label htmlFor="role">I am joining as</label>
+                <select
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                >
+                  <option value="student">Student</option>
+                  <option value="mentor">Mentor</option>
+                </select>
+              </>
+            )}
+
+            {message && (
+              <div
+                className={`form-message ${
+                  message.includes("successful") || message.includes("created")
+                    ? "success"
+                    : "error"
+                }`}
+                role="status"
+              >
+                {message}
+              </div>
+            )}
+
+            <button className="submit-button" type="submit" disabled={loading}>
+              {loading
+                ? "Please wait..."
+                : isLogin
+                  ? "Sign In →"
+                  : "Create Account →"}
+            </button>
+          </form>
+
+          <p className="switch-text">
+            {isLogin ? "New to CapstoneHub?" : "Already have an account?"}{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setMessage("");
+              }}
+            >
+              {isLogin ? "Create an account" : "Sign in"}
+            </button>
+          </p>
+
+          <p className="security-note">
+            Your journey starts with a single step.
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
       </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    </main>
+  );
 }
 
-export default App
+export default App;
